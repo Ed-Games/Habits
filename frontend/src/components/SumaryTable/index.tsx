@@ -1,4 +1,11 @@
+import { generateDatesFromYearBegining } from "../../utils/generate-dates-from-year-beginning";
+import { HabitDay } from "../HabitDay";
+
 const weekdays = ["D", "S", "T", "Q", "Q", "S", "S"];
+const sumaryDates = generateDatesFromYearBegining();
+
+const minimumSumaryDatesSize = 18 * 7; // 18 weeka
+const amountOfdaysToFill = minimumSumaryDatesSize - sumaryDates.length;
 
 export function SumaryTable() {
   return (
@@ -15,7 +22,14 @@ export function SumaryTable() {
       </div>
 
       <div className="grid grid-rows-7 grid-flow-col gap-3">
-        <div className="w-10 h-10  bg-zinc-900  border-2 border-zinc-800 rounded-lg"></div>
+        {sumaryDates.map((date) => (
+          <HabitDay key={date.toString()} />
+        ))}
+
+        {amountOfdaysToFill > 0 &&
+          Array.from({ length: amountOfdaysToFill }).map((item, index) => (
+            <div key={index} className="w-10 h-10 bg-zinc-900 border-2 border-zinc-800 rounded-lg opacity-40 cursor-not-allowed"/>
+          ))}
       </div>
     </div>
   );

@@ -100,14 +100,12 @@ export async function AppRoutes(app: FastifyInstance) {
     });
 
     if (dayHabit) {
-      console.log('delete')
       await prisma.dayHabit.delete({
         where: {
           id: dayHabit.id,
         },
       });
     } else {
-      console.log('create')
       await prisma.dayHabit.create({
         data: {
           day_id: day.id,
@@ -115,5 +113,14 @@ export async function AppRoutes(app: FastifyInstance) {
         },
       });
     }
+  });
+
+  app.get("/sumary", async () => {
+    const summary = await prisma.$queryRaw`SELECT D.id, D.date, 
+      ( SELECT cast(count(*) as float) FROM day_habit DH WHERE DH.day_id = D.id ) as completed,
+      (SELECT cast(count(*) as float) FROM habit_week_days HWD JOIN habits H ON H.id = HWD.habit_id 
+      WHERE HWD.week_day = cast(strftime('%w', D.date / 1000.0, 'unixepoch' ) as int ) AND H.created_at <= D.date ) as amount
+      FROM days D `;
+    return summary;
   });
 }
